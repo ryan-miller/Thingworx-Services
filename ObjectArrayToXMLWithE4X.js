@@ -4,6 +4,7 @@ var bigBangCast,
    i=0,
    result;
 
+// we'll convert this object array to an xml document
 bigBangCast = [
 	{ 
 		firstName: "Leonard",
@@ -38,16 +39,17 @@ bigBangCast = [
 
 castCount = bigBangCast.length;
 
-bigBangCastXML = <cast><person></person></cast>;
-
 for (i; i<castCount; i++) {
 
 	var member = bigBangCast[i],
 	   fullName = member.firstName + (member.lastName ? (' ' + member.lastName) : '');
 	
+	// must create a person element
 	bigBangCastXML.person[i] = <person />;
+	// add fullname element 
 	bigBangCastXML.person[i].fullName = <fullName>{fullName}</fullName>;
 	
+	// add option elements and attributes if present
 	if (member.profession) {
 		bigBangCastXML.person[i].profession = member.profession;
 	}
@@ -60,4 +62,5 @@ for (i; i<castCount; i++) {
 
 }
 
+// return XML as result from service
 result = bigBangCastXML;
