@@ -7,7 +7,7 @@ var i = 0,
         },    
     assets = [
         {
-            name: "TucsonTransformer-1",
+            name: "TucsonTransformer1",
             substation: "TucsonSubstation",
             alerts: [
                 {
@@ -48,7 +48,7 @@ var i = 0,
             ]
         },
         {
-            name: "TucsonTransformer-2",
+            name: "TucsonTransformer2",
             substation: "TucsonSubstation",
             alerts: [
                 {
@@ -89,7 +89,7 @@ var i = 0,
             ]
         },
         {
-            name: "TucsonTurbine-1",
+            name: "TucsonTurbine1",
             substation: "TucsonSubstation",
             alerts: [
                 {
@@ -143,7 +143,7 @@ for (var i=0; i<rows; i++) {
     var params         = {
         source : fakeAsset.name,
         values : values,
-        timestamp : randomDate(new Date(2011,0,1).getTime(), new Date());
+        timestamp : randomDate(new Date(2011,0,1).getTime(), new Date())
     };
 
     Things['SubstationAlarmHistory'].AddStreamEntry(params);
