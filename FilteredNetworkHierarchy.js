@@ -1,5 +1,5 @@
 var connections,
-   areas,
+   connection,
    result,
    networkName = me.name + '_AreaNetwork';
    
@@ -8,21 +8,20 @@ connections = Networks[networkName].GetSubNetworkConnectionsWithTemplate({
    maxDepth : 10
 });
    
-areas = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
+result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
 	infoTableName : "InfoTable",
 	dataShapeName : "ServingAreasInformation"
 });
 
-for each (var connection in connections.rows) {
+for each (connection in connections.rows) {
 
 	if (connection.to !== me.name) {
-	   areas.AddRow({
+	   result.AddRow({
 		   Area: connection.to,
 		   Link: Things[connection.to].Floorplan
 	   });
 	}
 }
 
-result = areas;
 
 

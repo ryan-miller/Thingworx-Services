@@ -2,7 +2,9 @@ var bigBangCast,
    bigBangCastXML = <cast />,
    castCount,
    i=0,
-   result;
+   result,
+   member,
+   fullName;
 
 // we'll convert this object array to an xml document
 bigBangCast = [
@@ -41,8 +43,8 @@ castCount = bigBangCast.length;
 
 for (i; i<castCount; i++) {
 
-	var member = bigBangCast[i],
-	   fullName = member.firstName + (member.lastName ? (' ' + member.lastName) : '');
+	member = bigBangCast[i];
+	fullName = member.firstName + (member.lastName ? (' ' + member.lastName) : '');
 	
 	// must create a person element
 	bigBangCastXML.person[i] = <person />;

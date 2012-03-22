@@ -129,24 +129,25 @@ var i = 0,
                 }
             ]
         }
-    ];   
+    ],
+    fakeAsset,
+    fakeAlert,
+    values
     
-for (var i=0; i<rows; i++) {
-    var fakeAsset = randomArrayValue(assets); 
-    var fakeAlert = randomArrayValue(fakeAsset.alerts);
-    var values         = Things['SubstationAlarmHistory'].CreateValues();
+for (i; i<rows; i++) {
+    fakeAsset = randomArrayValue(assets); 
+    fakeAlert = randomArrayValue(fakeAsset.alerts);
+    values         = Things['SubstationAlarmHistory'].CreateValues();
     values.Substation  = fakeAsset.substation;
     values.Priority    = randomArrayValue(fakeAlert.priority);
     values.Condition   = randomArrayValue(fakeAlert.condition);
     values.Status      = randomArrayValue(fakeAlert.status);
 
-    var params         = {
+    Things['SubstationAlarmHistory'].AddStreamEntry({
         source : fakeAsset.name,
         values : values,
         timestamp : randomDate(new Date(2011,0,1).getTime(), new Date())
-    };
-
-    Things['SubstationAlarmHistory'].AddStreamEntry(params);
+    });
 
 }
 

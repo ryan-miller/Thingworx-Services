@@ -8,17 +8,19 @@ var connections,
     queryResults,
     aggregateResults,
     sortedAggregateResults,
-    cumulativeTotal = 0;
+    cumulativeTotal = 0,
+    agg,
+    c;
 
 // build connections list for "IN" clause
 connections = Networks['ArizonaPower'].GetSubNetworkConnections({start:me.name});
 connectedThings = [];
-for each (var c in connections.rows) {
+for each (c in connections.rows) {
 	connectedThings.push(c.to);
 }
 
 // build result infotable
-pareto = INFOTABLE_FUNCTIONS.CreateInfoTableFromDataShape({
+result = INFOTABLE_FUNCTIONS.CreateInfoTableFromDataShape({
                 infoTableName:"InfoTable",
                 dataShapeName:"AssetAlarmParetoInformation"
             });
@@ -53,13 +55,11 @@ sortedAggregateResults = INFOTABLE_FUNCTIONS.Sort({
 });
 
 // add aggregates to results with cumulative total
-for each (var agg in sortedAggregateResults.rows) {
+for each (agg in sortedAggregateResults.rows) {
 	cumulativeTotal += agg.COUNT_source
-	pareto.AddRow({
+	result.AddRow({
 		AssetName: agg.source,
 		AlarmCount: agg.COUNT_source,
 		CumulativeTotal: cumulativeTotal
 	});
 }
-
-var result = pareto;
