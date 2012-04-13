@@ -1,179 +1,155 @@
-try
-{
-	var MetrixTableResult = Things['MetrixDBThing'].GetAllProducts();
-	for each(var Row in MetrixTableResult.rows)
-	{
-		var ThingName = "PROD_" + Row.product_id;
-		var thing = Things[ThingName];
-		if(thing == null)	
-		{ 
-			logger.warn("trying to clone " + ThingName);
+var sourceData = Resources['ContentLoaderFunctions'].LoadXML({
+      	                     username : "Administrator",	
+      	                     ignoreSSLErrors : false,
+      	                     password : "admin",
+      	                     url : "http://10.128.0.133/Thingworx/play/AllProducts.xml",
+      	                     timeout : 60
+                           }),
+    source,
+    prodThingName,
+    prodThing,
+    ipuThingName,
+    ipuThing,
+    repoThing,
+    repoThingName,
+    createThingByCloning = function(source, name, description) {
+       Resources['EntityServices'].CloneThing({
+		    sourceThingName : source,
+		    name : name,
+		    description : description
+		 });
+		 
+		 Things[name].EnableThing();
+		 Things[name].RestartThing();
+    },
+    fsr,
+    createUser = function(name, description, password) {
+       Resources['EntityServices'].CreateUser({
+		    name : name,
+		    description : description,
+			 password : password
+		 });
+    },
+    addUserToGroup = function(user, group) {
+       logger.warn("Group: " + group + " \tUser: " + user);
+       Groups[group.name].AddMember({ member : user.name });
+    },
+    setFSR = function(source, role) {
+       fsr = role + "FSR";
 
-			// Create a New Product Thing
-			Resources['EntityServices'].CloneThing({
-				name : ThingName ,
-				sourceThingName : Row.ProductName + "MasterThing",
-				description : Row.model_id + "-" + Row.serial_id
-			});
+       if (Users[source[fsr]] == null) {
+          // create user 
+          createUser(source[fsr], source[fsr + '_last_name'] + "," + source[fsr + '_first_name'], "")
+          // add to group
+				logger.warn("FSR Group: " + fsr);
+				logger.warn("Group: " + source[fsr + '_Group']);
+          addUserToGroup(Users[source[fsr]], Groups[source[fsr + '_Group']])
+          // assign user properties
+          Users[source[fsr]].firstName = source[fsr + '_first_name'];
+          Users[source[fsr]].lastName = source[fsr + '_last_name'];
+          Users[source[fsr]].title = source[fsr + '_Group'];
+       }
+       // set primary fsr
+       prodThing[fsr] = source[fsr];
+    },
+    configTable,
+    updateFileRepo = function (ipuThingName, repoThingName) {
+       logger.warn("ipuThingName: " + ipuThingName + "\trepoThingName: " + repoThingName);
+       configTable = Things[ipuThingName].GetConfigurationTable({ tableName : "FileTransferSettings"});
+       configTable.rows[0].repository = repoThingName;
+       Things[ipuThingName].SetConfigurationTable({
+          persistent : true,
+			 configurationTable : configTable,
+			 tableName : "FileTransferSettings"
+		 });
+    },   
+    updateCommunication = function (prodThingName, ipuThingName) {
+       // get current configuration table
+		 configTable = Things[prodThingName].GetConfigurationTable({ tableName : "Communication"});
+		 // set new file repo
+		 configTable.rows[0].useSharedChannel = true;
+		 configTable.rows[0].sharedChannel = ipuThingName;
+		 // set new configuration table
+		 Things[prodThingName].SetConfigurationTable({
+		    persistent : true,
+		    configurationTable : configTable,
+			 tableName : "Communication"
+		 });
+    };
+    
+logger.warn("SourceData: " + sourceData.p.length);
 
-			// Add the properties to the cloned Thing
-			var cloned = Things[ThingName];
-			cloned.Model = Row.model_id;
-			cloned.ModelType = Row.ProductName;
-			cloned.Serial = Row.serial_id;
-			cloned.PlaceID = "PLACE_" + Row.place_id;
-			cloned.ProductID = Row.product_id;
-
-			logger.warn("Row.model_id = " + Row.model_id + 
-			   " Row.ProductName = " + Row.ProductName + 
-			   " Row.serial_id = " + Row.serial_id + 
-			   " Row.place_id = " + Row.place_id + 
-			   " Row.product_id = " + Row.product_id );
-			
-			//	lookup user in thingworx if not exist then create it
-			// Begin Primary FSR
-			if(Row.PrimaryFSR != null)
-			{
-				var primaryFSR = Users[Row.PrimaryFSR];			
-				if(primaryFSR != null)
-				{
-					//	found this user
-					cloned.PrimaryFSR = Row.PrimaryFSR;
-				}
-				else
-				{
-					//	create user in thingworx
-					// Create FSR User
-					Resources['EntityServices'].CreateUser({
-							description : Row.PrimaryFSR_last_name + "," + Row.PrimaryFSR_first_name,
-							name : Row.PrimaryFSR,
-							password : ""
-					});
-					cloned.PrimaryFSR = Row.PrimaryFSR;
-					// User Properties
-					Users[Row.PrimaryFSR].firstName = Row.PrimaryFSR_first_name;
-					Users[Row.PrimaryFSR].lastName = Row.PrimaryFSR_last_name;
-					Users[Row.PrimaryFSR].title = Row.PrimaryFSR_Group;
-					// Add the user to the FSR Group
-					Groups[Row.PrimaryFSR_Group].AddMember({ member : Row.PrimaryFSR });
-				}
-			}
-			//END Primary FSR
-			//BEGIN Secondary FSR
-			if(Row.SecondaryFSR != null)
-			{
-				var secondaryFSR = Users[Row.SecondaryFSR];
-				if(secondaryFSR != null)
-				{
-					//	found this user				
-					cloned.SecondaryFSR = Row.SecondaryFSR;
-				}
-				else
-				{
-					//	create user in thingworx
-					logger.warn("create this user SecondaryFSR " + Row.SecondaryFSR);
-					// Create FSR User
-					Resources['EntityServices'].CreateUser({
-							description : Row.SecondaryFSR_last_name + "," + Row.SecondaryFSR_first_name,
-							name : Row.SecondaryFSR,
-							password : ""
-					});
-					cloned.SecondaryFSR = Row.SecondaryFSR;
-					// User Properties
-					Users[Row.SecondaryFSR].firstName = Row.SecondaryFSR_first_name;
-					Users[Row.SecondaryFSR].lastName = Row.SecondaryFSR_last_name;
-					Users[Row.SecondaryFSR].title = Row.SecondaryFSR_Group;
-					// Add the user to the FSR Group
-					Groups[Row.SecondaryFSR_Group].AddMember({ member : Row.SecondaryFSR });
-				}		
-			}			
-			//END Secondary FSR
-			
-			// Create IPU By Product_ID
-			var IPUThingName = "IPU_" + Row.product_id;
-			var IPUthing = Things[IPUThingName];
-			if(IPUthing == null)	
-			{ 
-				// CREATE IPU
-				Resources['EntityServices'].CloneThing({
-					name : IPUThingName ,
-					sourceThingName : "IPUMasterThing",
-					description : "IPU-" + Row.model_id + "-" + Row.serial_id
-				});					
-				// Add the properties to the IPU Thing
-				var IPUcloned = Things[IPUThingName];
-				IPUcloned.Model = "IPU";
-				IPUcloned.ModelType = "IPU";
-				IPUcloned.Serial = Row.serial_id;
-				IPUcloned.PlaceID = "PLACE_" + Row.place_id;
-				IPUcloned.ProductID = Row.product_id;	
-				//
-				//	connection string
-				//
-				IPUcloned.ConnectionString=cloned.ConnectionString;				
-				if(cloned.ModelType != "ALPHA" && cloned.ModelType != "HST")
-				{
-					//CREATE File Repository
-					var FileRepoThingName = "FileRepo_" + IPUThingName;
-					var FileRepothing = Things[FileRepoThingName];
-					if(FileRepothing == null)	
-					{
-			
-						Resources['EntityServices'].CloneThing({
-							description : 'File Repository for ' + IPUThingName,
-							name : FileRepoThingName,
-							sourceThingName : 'FileRepositoryMaster'
-						});																	
-					}			
-
-					var FileRepoCloned = Things[FileRepoThingName];							
-					if(FileRepoCloned != null)
-					{		
-						var configTable;			   
-									   
-						// method to overwrite file repo
-						updateFileRepo = function () {
-							// get current configuration table
-							configTable = Things[IPUThingName].GetConfigurationTable({ tableName : "FileTransferSettings"});
-							// set new file repo
-							configTable.rows[0].repository = FileRepoThingName;  
-							// set new configuration table
-							Things[IPUThingName].SetConfigurationTable({
-								persistent : true,
-								configurationTable : configTable,
-								tableName : "FileTransferSettings"
-							});
-						};	
-							
-						// method to overwrite Communication
-						updateCommunication = function () {
-							// get current configuration table
-							configTable = Things[ThingName].GetConfigurationTable({ tableName : "Communication"});
-							// set new file repo
-							configTable.rows[0].useSharedChannel = true;
-							configTable.rows[0].sharedChannel = IPUThingName;
-							// set new configuration table
-							Things[ThingName].SetConfigurationTable({
-								persistent : true,
-								configurationTable : configTable,
-								tableName : "Communication"
-							});
-						};	
-							
-						// update file repo to new file repo
-						updateFileRepo();	
-							
-						// update Communication Channel
-						updateCommunication();						
-					}		
-					//END File Repository	
-				}
-			}
-			// END IPU		
-		} // END if(IPUthing == null)
-	} // END for each
+for each ( source in sourceData.p ) {
+   
+   prodThingName = "PROD_" + source.product_id;
+   prodThing = Things[prodThingName]
+   
+   if(prodThing == null) {
+      logger.warn("Creating " + prodThingName);
+      // create a new prod from product master thing
+      createThingByCloning(source.ProductName + "MasterThing", prodThingName, source.model_id + "-" + source.serial_id)
+      
+      // add properties to new thing
+      prodThing = Things[prodThingName];
+      if(prodThing == null) {
+         logger.warn(prodThingName + " does not exist");
+      } else {
+         prodThing.Model = source.model_id;
+         prodThing.ModelType = source.ProductName;
+         prodThing.Serial = source.serial_id;
+         prodThing.PlaceID = "PLACE_" + source.place_id;
+         prodThing.ProductID = source.product_id;
+      }
+      
+      // take care of primary fsr
+      if (source.PrimaryFSR != null) {
+         setFSR(source, "Primary");
+      }
+      // take care of secondary fsr
+      if (source.SecondaryFSR != null) {
+         setFSR(source, "Secondary"); 
+      }
+      
+      // create the IPU for the product
+      ipuThingName = "IPU_" + source.product_id;
+      ipuThing = Things[ipuThingName];
+      
+      if (ipuThing == null) {
+         // create a new IPU from master thing
+         createThingByCloning("IPUMasterThing", ipuThingName, "IPU-" + source.model_id + "-" + source.serial_id)
+         // add properties to the new IPU
+         ipuThing = Things[ipuThingName];
+         if (ipuThing == null) {
+            logger.warn(ipuThingName + " does not exist");
+         } else {
+            ipuThing.Model = "IPU";
+            ipuThing.ModelType = "IPU";
+            ipuThing.Serial = source.serial_id;
+            ipuThing.PlaceID = "PLACE_" + source.place_id;
+            ipuThing.ProductID = source.product_id;
+            ipuThing.ConnectionString = prodThing.ConnectionString;
+            
+            if (prodThing.ModelType != "ALPHA" && prodThing.ModelType != "HST") {
+               // create file repo
+               repoThingName = "FileRepo_" + ipuThingName;
+               repoThing = Things[repoThingName];
+               
+               if (repoThing == null) {
+                  // create a repo thing
+                  createThingByCloning("FileRepositoryMaster", repoThingName, "File Repository for " + ipuThingName);
+                  repoThing = Things[repoThingName];
+               }
+               
+               if (repoThing == null) {
+                  logger.warn(repoThing + "does not exist");
+               } else {
+                  updateFileRepo(ipuThingName, repoThingName);
+                  updateCommunication(prodThingName, ipuThingName);
+               }
+            }
+         }
+      }
+   } else {
+      logger.warn(prodThingName + " already exists.");
+   }
 }
-catch(err)
-{
-	logger.warn("Error on CloneAllProducts : " + err);
-}       
