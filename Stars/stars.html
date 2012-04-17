@@ -4,45 +4,23 @@
 
 </head>
 <body>
-   
-   <h1>OK</h1>
-   
-   <div>
-   </div>
-      
+
    <script src="raphael.js"></script>
    <script>
-      /*
-      public static function getNPointsOnCircle( center:Point, radius:Number, n:Number = 10 ) : Array
-      {
-
-          var alpha:Number = Math.PI * 2 / n;
-          var points:Array = new Array( n );
-
-          var i:int = -1;
-          while( ++i < n )
-          {
-              var theta:Number = alpha * i;
-              var pointOnCircle:Point = new Point( Math.cos( theta ) * radius, Math.sin( theta ) * radius );
-              points[ i ] = center.add( pointOnCircle );
-          }
-
-          return points;
-
-      }
-      */
    
-      var getNPointsOnCircle = function (cX, cY, radius, n) {
+      var getNPointsOnCircle = function (circle, n) {
+         
          var alpha = Math.PI * 2 / n;
          var points = [];
          
          var i = -1;
          while (++i < n) {
-            var theta = alpha * i;
+            var theta = alpha * i + Math.PI;
             var point = {
-               x : Math.cos(theta) * radius + 150,
-               y : Math.sin(theta) * radius + 150
+               x : Math.sin(theta) * circle.attrs.r + circle.attrs.r,
+               y : Math.cos(theta) * circle.attrs.r + circle.attrs.r
             }
+            
             console.log(point.x + " : " + point.y);
             points.push(point);
          }
@@ -53,25 +31,33 @@
       var drawPoint = function (x, y) {
          paper.circle(x, y, 10);
       }
-      var paper = Raphael(300, 300, 300, 300);
-      var rectangle = paper.rect(0,0, 300, 300);
-      var circle = paper.circle(150,150,150);
-      var allPoints = getNPointsOnCircle(150, 150, 150, 5)
+      var paper = Raphael(100, 100, 200, 200);
+      var border = paper.rect(0,0, 200, 200);
+      var circle = paper.circle(100,100,100);
+      var allPoints = getNPointsOnCircle(circle, 5);
       
       for (var i = 0; i < allPoints.length; i++) {
          drawPoint(allPoints[i].x, allPoints[i].y);
       }
       
+      /* should be A => C, B => D, C=> E, D = A, and  E => B 
+         or allPoints[0] to allPoints[2] .. allPoints[4] to all Points[1]
+      */
       // draw A to C
-      paper.path("M"+allPoints[0].x +","+ allPoints[0].y+"L"+allPoints[2].x +","+ allPoints[2].y);
+      var p1 = paper.path("M"+allPoints[0].x +","+ allPoints[0].y+"L"+allPoints[2].x +","+ allPoints[2].y);
+      p1.attr("stroke-width", "3");
       // draw A to D
-      paper.path("M"+allPoints[0].x +","+ allPoints[0].y+"L"+allPoints[3].x +","+ allPoints[3].y);
+      var p2 = paper.path("M"+allPoints[0].x +","+ allPoints[0].y+"L"+allPoints[3].x +","+ allPoints[3].y);
+      p2.attr("stroke-width", "3");
       // draw B to D
-      paper.path("M"+allPoints[1].x +","+ allPoints[1].y+"L"+allPoints[3].x +","+ allPoints[3].y);
+      var p3 = paper.path("M"+allPoints[1].x +","+ allPoints[1].y+"L"+allPoints[3].x +","+ allPoints[3].y);
+      p3.attr("stroke-width", "3");
       // draw B to E
-      paper.path("M"+allPoints[1].x +","+ allPoints[1].y+"L"+allPoints[4].x +","+ allPoints[4].y);
+      var p4 = paper.path("M"+allPoints[1].x +","+ allPoints[1].y+"L"+allPoints[4].x +","+ allPoints[4].y);
+      p4.attr("stroke-width", "3");
       // draw C to E
-      paper.path("M"+allPoints[2].x +","+ allPoints[2].y+"L"+allPoints[4].x +","+ allPoints[4].y);
+      var p5 = paper.path("M"+allPoints[2].x +","+ allPoints[2].y+"L"+allPoints[4].x +","+ allPoints[4].y);
+      p5.attr("stroke-width", "3");
       
       // find intersecting points
       //http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
