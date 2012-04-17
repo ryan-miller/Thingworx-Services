@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+   
+   <h1>OK</h1>
+   
+   <div>
+   </div>
+      
+   <script src="raphael.js"></script>
+   <script>
+      /*
+      public static function getNPointsOnCircle( center:Point, radius:Number, n:Number = 10 ) : Array
+      {
+
+          var alpha:Number = Math.PI * 2 / n;
+          var points:Array = new Array( n );
+
+          var i:int = -1;
+          while( ++i < n )
+          {
+              var theta:Number = alpha * i;
+              var pointOnCircle:Point = new Point( Math.cos( theta ) * radius, Math.sin( theta ) * radius );
+              points[ i ] = center.add( pointOnCircle );
+          }
+
+          return points;
+
+      }
+      */
+   
+      var getNPointsOnCircle = function (cX, cY, radius, n) {
+         var alpha = Math.PI * 2 / n;
+         var points = [];
+         
+         var i = -1;
+         while (++i < n) {
+            var theta = alpha * i;
+            var point = {
+               x : Math.cos(theta) * radius + 150,
+               y : Math.sin(theta) * radius + 150
+            }
+            console.log(point.x + " : " + point.y);
+            points.push(point);
+         }
+         return points;
+      }
+   
+      // Creates canvas 320 × 200 at 10, 50
+      var drawPoint = function (x, y) {
+         paper.circle(x, y, 10);
+      }
+      var paper = Raphael(300, 300, 300, 300);
+      var rectangle = paper.rect(0,0, 300, 300);
+      var circle = paper.circle(150,150,150);
+      var allPoints = getNPointsOnCircle(150, 150, 150, 5)
+      
+      for (var i = 0; i < allPoints.length; i++) {
+         drawPoint(allPoints[i].x, allPoints[i].y);
+      }
+      
+      // draw A to C
+      paper.path("M"+allPoints[0].x +","+ allPoints[0].y+"L"+allPoints[2].x +","+ allPoints[2].y);
+      // draw A to D
+      paper.path("M"+allPoints[0].x +","+ allPoints[0].y+"L"+allPoints[3].x +","+ allPoints[3].y);
+      // draw B to D
+      paper.path("M"+allPoints[1].x +","+ allPoints[1].y+"L"+allPoints[3].x +","+ allPoints[3].y);
+      // draw B to E
+      paper.path("M"+allPoints[1].x +","+ allPoints[1].y+"L"+allPoints[4].x +","+ allPoints[4].y);
+      // draw C to E
+      paper.path("M"+allPoints[2].x +","+ allPoints[2].y+"L"+allPoints[4].x +","+ allPoints[4].y);
+      
+      // find intersecting points
+      //http://www.geog.ubc.ca/courses/klink/gis.notes/ncgia/u32.html
+   </script>
+</body>
+</html>
