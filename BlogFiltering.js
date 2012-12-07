@@ -35,7 +35,7 @@ for each(connection in connections.rows) {
       assetType:      Things[connection.to].ResourceType,
       AlarmState:     Things[connection.to].AlarmState,
       homeMashup:     Things[connection.to].homeMashup,
-		  toDescription:  Things[connection.to].description
+      toDescription:  Things[connection.to].description
     })
-	}
+  }
 }
