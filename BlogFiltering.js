@@ -21,7 +21,7 @@ var getFilterTag = function(allTags) {
 }
 
 for each(connection in connections.rows) {
-	if (connection.to.substring(0,4) != "Cell") {
+  if (connection.to.substring(0,4) != "Cell") {
     result.AddRow({
 		  to:             connection.to,
       from:           connection.from,
