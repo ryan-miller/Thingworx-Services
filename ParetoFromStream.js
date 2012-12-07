@@ -1,65 +1,52 @@
-var connections,
-    connectedThings,
-    pareto,
-    ALARM_HISTORY_STREAM = Things['SubstationAlarmHistory'],
-    INFOTABLE_FUNCTIONS = Resources['InfoTableFunctions'],
-    total = ALARM_HISTORY_STREAM.GetStreamEntryCount().Result,
-    streamQuery,
-    queryResults,
-    aggregateResults,
-    sortedAggregateResults,
-    cumulativeTotal = 0,
-    agg,
-    c;
+var connections = Networks['ArizonaPower'].GetSubNetworkConnections({ start: me.name })
+var connectedThings = []
+var c, r
+var cumulativeTotal = 0
 
 // build connections list for "IN" clause
-connections = Networks['ArizonaPower'].GetSubNetworkConnections({start:me.name});
-connectedThings = [];
 for each (c in connections.rows) {
-	connectedThings.push(c.to);
+  connectedThings.push(c.to)
 }
 
-// build result infotable
-result = INFOTABLE_FUNCTIONS.CreateInfoTableFromDataShape({
-                infoTableName:"InfoTable",
-                dataShapeName:"AssetAlarmParetoInformation"
-            });
-
-// query stream entries
-streamQuery = {
-                  filters: {
-                     type: "IN",
-	                  fieldName: "source",
-	                  values: connectedThings
-                  },
-                  sorts: [{
-                     fieldName: "source"
-                  }]
-};
-
-queryResults = ALARM_HISTORY_STREAM.QueryStreamEntriesWithData({query:streamQuery});
+var alarmHistory = Things['SubstationAlarmHistory'].QueryStreamEntriesWithData({ 
+  query: {
+    filters: {
+      type: "IN",
+      fieldName: "source",
+      values: connectedThings
+    },
+    sorts: [{
+      fieldName: "source"
+    }]
+  }
+})
 
 // aggregate alarms
-aggregateResults = INFOTABLE_FUNCTIONS.Aggregate({
-	aggregates : "COUNT",
-	t : queryResults,
-	columns : "source",
-	groupByColumns : "source"
-});
+var alarmCount = Resources['InfoTableFunctions'].Aggregate({
+	aggregates: "COUNT",
+	t: alarmHistory,
+	columns: "source",
+	groupByColumns: "source"
+})
 
 // sort aggregrated alarms
-sortedAggregateResults = INFOTABLE_FUNCTIONS.Sort({
-    t:aggregateResults,
-    sortColumn:"COUNT_source",
-    ascending: false
-});
+var sortedAlarmCount = Resources['InfoTableFunctions'].Sort({
+  t: alarmCount,
+  sortColumn: "COUNT_source",
+  ascending: false
+})
+
+var result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
+  infoTableName: "InfoTable",
+  dataShapeName: "AssetAlarmParetoInformation"
+})
 
 // add aggregates to results with cumulative total
-for each (agg in sortedAggregateResults.rows) {
-	cumulativeTotal += agg.COUNT_source
+for each (r in sortedAlarmCount.rows) {
+	cumulativeTotal += r.COUNT_source
 	result.AddRow({
-		AssetName: agg.source,
-		AlarmCount: agg.COUNT_source,
+		AssetName: r.source,
+		AlarmCount: r.COUNT_source,
 		CumulativeTotal: cumulativeTotal
-	});
+	})
 }
