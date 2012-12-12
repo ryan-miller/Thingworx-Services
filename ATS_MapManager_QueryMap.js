@@ -9,27 +9,13 @@ try {
     dataShapeName : "ATSMapShape"
   })
 
-  // get my account
-  var accountInSession = Resources['CurrentSessionInfo'].GetGlobalSessionValues().rows[0].UIAccount
-  var myAccount = Things[accountInSession].name
-
-  // get my locations
-  var myLocations = (function () {
-    var locations = ThingShapes['ATSLocationShape'].GetImplementingThingsWithData()
-    return Resources['InfoTableFunctions'].EQFilter({
-      fieldName:  "CustomerAccount",
-      value:      myAccount,
-      t:          locations
-    })
-  })()
-
   // add location info rows
   var addLocationRows = (function () {
     var location
     var recentAlert = false
     var diff
 
-    for each (location in myLocations.rows) {
+    for each (location in me.GetAccountLocations().rows) {
 
       diff = now.getTime() - location.LastAlert.getTime()
       recentAlert = (diff > singleDay) ? true : false
@@ -54,16 +40,6 @@ try {
     }
   })()
 
-  // get my devices
-  var myDevices = (function () {
-    var devices = ThingTemplates['ATSDeviceTemplate'].GetImplementingThingsWithData()
-    return Resources['InfoTableFunctions'].EQFilter({
-      fieldName:  "CustomerAccount",
-      value:      myAccount,
-      t:          devices
-    })
-  })()
-
   // add device info rows
   var addDeviceRows = (function () {
     var device
@@ -73,7 +49,7 @@ try {
     var IsConflicted, IsMobile, IsFixed
     var State, MashupName
 
-    for each(device in myDevices.rows){
+    for each(device in me.GetAccountDevices().rows){
 
       alertDiff = now.getTime() - device.Alerts_LastAlertTime.getTime()
       recentAlert = (alertDiff > singleDay) ? true : false
