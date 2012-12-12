@@ -43,7 +43,6 @@ try {
         IsLocation:   true,
         IsConflicted: false,
         IsFixed:      false,
-        IsLocation:   false,
         IsMobile:     false,
         RecentLogin:  false,
         
