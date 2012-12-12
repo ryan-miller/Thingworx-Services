@@ -13,26 +13,26 @@ bigBangCast = [
 		
 	},
 	{
-		firstName: "Sheldon",
-		lastName: "Cooper",
-		degree: "PHD",
+		firstName: 	"Sheldon",
+		lastName: 	"Cooper",
+		degree: 		"PHD",
 		profession: "theoretical physicist",
-		iq: "187"
+		iq: 				"187"
 	},
 	{
-		firstName: "Penny",
+		firstName: 	"Penny",
 		profession: "waitress"
 	},
 	{
-		firstName: "Howard",
-		lastName: "Wolowitz",
-		degree: "MEng",
+		firstName: 	"Howard",
+		lastName: 	"Wolowitz",
+		degree: 		"MEng",
 		profession: "aerospace engineer"
 	},
 	{
-		firstName: "Rajesh",
-		lastName: "Koothrappali",
-		degree: "PHD",
+		firstName: 	"Rajesh",
+		lastName: 	"Koothrappali",
+		degree: 		"PHD",
 		profession: "particle astrophysicist"
 	}
 ]
