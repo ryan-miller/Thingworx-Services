@@ -90,8 +90,10 @@ try {
       // build state !order is important
       State = (IsFixed)       ? "Fixed" : 
               (IsMobile)      ? "Mobile" : 
-              (IsConflicted)  ? "Conflicted" : 
-              (recentLogin)   ? "Recent" : ""
+              (IsConflicted)  ? "Conflicted" : ""   
+      if (recentLogin) {
+        State += "Recent"
+      }
       State += device.BaseSignType
 
       // build mashup !order is important
