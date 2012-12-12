@@ -130,6 +130,12 @@ try {
       })
     }
   })()
+  
+  // filter based on service input query object
+  result = Resources['InfoTableFunctions'].Query({
+    t: result,
+    query: Query
+  })
 
 } catch (err) {
   logger.error("Error getting Map: " + err)
