@@ -1,7 +1,6 @@
 var addFakeData = function (entry) {
 
   var values = me.CreateValues();
-  values.Recipients = ""
   values.Threshold  = entry.Threshold
   values.ImageID    = entry.ImageID
   values.Location   = entry.Location
@@ -19,33 +18,33 @@ var addFakeData = function (entry) {
 var i = 0
 var fakeData = [
   {
-    Threshold: 35,
-    ImageID: 0,
+    Threshold: 30,
+    ImageID: '',
     Location: 'ATSLocation1',
     Details: 'None at this time',
-    Device: 'ATSDevice1',
+    Device: 'ATSDevice2',
     tags: 'Recipients:rmiller;Recipients:jgeiger;AlertTypes:BluetoothFailure'
   },
   {
     Threshold: 50,
-    ImageID: 0,
-    Location: 'ATSLocation2',
+    ImageID: '',
+    Location: 'ATSLocation5',
     Details: 'Congestion, see Image',
-    Device: 'ATSDevice2',
+    Device: 'ATSDevice4',
     tags: 'Recipients:rmiller;Recipients:jgeiger;AlertTypes:Congestion'
   },
   {
     Threshold: 10,
-    ImageID: 0,
-    Location: 'ATSLocation1',
+    ImageID: '',
+    Location: 'ATSLocation4',
     Details: 'Tamper, see Image',
     Device: 'ATSDevice1',
     tags: 'Recipients:rmiller;Recipients:jgeiger;AlertTypes:Tamper'
   },
   {
     Threshold: 12,
-    ImageID: 0,
-    Location: 'ATSLocation1',
+    ImageID: '',
+    Location: 'ATSLocation',
     Details: 'None at this time',
     Device: 'ATSDevice1',
     tags: 'Recipients:rmiller;Recipients:jgeiger;AlertTypes:TimeOutOfSync'
