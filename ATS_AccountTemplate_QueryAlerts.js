@@ -46,9 +46,9 @@ for each(alert in alerts.rows) {
   locname = (Things[alert.Location] === null) ? "" : Things[alert.Location].LocationName
   result.AddRow({
     LocationName: locname,
+    Device:       Things[alert.Device].NickName,
     AlertDate:    alert.timestamp, 
     Details:      alert.Details, 
-    Device:       alert.Device,
     ImageID:      alert.ImageID,
     Location:     alert.Location,
     Threshold:    alert.Threshold,
