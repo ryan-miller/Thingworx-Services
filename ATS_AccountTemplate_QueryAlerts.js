@@ -9,7 +9,7 @@ var getTerms = function (tags, vocab) {
   var tag
   
   for each(tag in tags) {
-    if (tag!= null && tag.vocabulary === vocab) {
+    if (tag.vocabulary === vocab) {
       termList.push(tag.vocabularyTerm)
     }  
   }
