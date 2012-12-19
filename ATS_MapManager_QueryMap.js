@@ -1,8 +1,32 @@
+/*
+ThingName
+DisplayName/Nickname
+GPSLocation
+IconState:
+  
+  DeviceNormal              :GreenShield,
+  DeviceMissing             :GreyShield,
+  DeviceAlert               :YellowShield,
+  DeviceConflict            :RedShield, 
+
+  LocationEmpty             :EmptyBlueBox, 
+  LocationNormal            :GreenShieldInsideBlueBox, 
+  LocationMissing           :GreyShieldInsideBlueBox, 
+  LocationAlert             :YellowShieldInsideBlueBox, 
+  LocationConflictEmpty     :RedBox 
+  LocationConflictNormal    :GreenSheildInsideRedBox   
+  LocationConflictMissing   :GreyShieldInsideRedBox, 
+  LocationConflictAlert     :YellowShieldInsideRedBox,
+
+*/
+
 //This service will list all of the Map data
 try {
-  var singleDay = 24 * 60 * 60 * 1000
+  
+  var singleDayInMs = 24 * 60 * 60 * 1000
   var now = new Date()
-
+  var yesterdayInMs = now.getTime() - singleDayInMs
+  
   // set up result data
   var result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
     infoTableName : "InfoTable",
@@ -11,31 +35,14 @@ try {
 
   // add location info rows
   var addLocationRows = (function () {
-    var location
-    var recentAlert = false
-    var diff
+    var site
 
-    for each (location in me.GetAccountLocations().rows) {
-
-      diff = now.getTime() - location.LastAlert.getTime()
-      recentAlert = (diff > singleDay) ? true : false
-
+    for each (site in me.GetAccountSites().rows) {
       result.AddRow({
-        Name:     location.name, 
-        NickName: location.LocationName, 
-        Location: location.Location,
-        Tags:     location.tags,
-        
-        IsLocation:   true,
-        IsConflicted: false,
-        IsFixed:      false,
-        IsMobile:     false,
-        RecentLogin:  false,
-        
-        MashupName: "ATSMapLocation",
-        State:      "Location",
-        
-        RecentAlert: recentAlert,
+        Name:     site.name, 
+        NickName: site.SiteName, 
+        Location: site.Location,
+        State:    'Location'
       })
     }
   })()
@@ -45,21 +52,25 @@ try {
     var device
     var recentAlert = false
     var recentLogin = false
-    var alertDiff, loginDiff
+    var loginDiffInSec
     var IsConflicted, IsMobile, IsFixed
     var State, MashupName
 
     for each(device in me.GetAccountDevices().rows){
-
-      alertDiff = now.getTime() - device.Alerts_LastAlertTime.getTime()
-      recentAlert = (alertDiff > singleDay) ? true : false
-
-      loginDiff =  (now.getTime() - device.LastLogin.getTime()) / (60 * 1000)
-      recentLogin = (loginDiff > device.WEB_ServerContactFrequency) ? true : false
+    
+      recentAlert = (device.Alerts_LastAlertTime.getTime() > yesterdayInMs) ? true : false  
+    
+      // recent Login occurs if lastLoginTime is between now and web_servercontactfrequency ago 
+      loginDiffInSec = (now.getTime() - device.LastLogin.getTime()) / (60 * 1000)
+      recentLogin = (loginDiffInSec < device.WEB_ServerContactFrequency) ? true : false
 
       IsConflicted = device.IsConflictedLocation ? true : false
 
-      IsMobile = Things[device.ATSLocation].IsMobile ? true : false
+      // devices may not have sites
+      if (device.Site === "") 
+        IsMobile = false
+      else 
+        IsMobile = Things[device.Site].IsMobile ? true : false
 
       IsFixed = !(IsConflicted || IsMobile)
 
