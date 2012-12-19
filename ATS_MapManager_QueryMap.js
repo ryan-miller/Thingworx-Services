@@ -62,7 +62,7 @@ try {
       loginDiffInSec = (now.getTime() - device.LastLogin.getTime()) / (60 * 1000)
       recentLogin = (loginDiffInSec < device.WEB_ServerContactFrequency) ? true : false
 
-      if (device.IsConflictedLocation) {
+      if (device.IsConflictedWithSiteGPS) {
         state += 'Conflict'
         priority = 1
       } else if (recentAlert) {
@@ -209,6 +209,20 @@ try {
     })
 
   }
+
+  if (!IncludeEmptySites) {
+    result = Resources['InfoTableFunctions'].Query({
+      query: {
+        filters: {
+          type: 'NE',
+          fieldName: 'State',
+          value: 'LocationEmpty'
+        }
+      },
+      t: result
+    })
+  }
+  
 } catch (err) {
   logger.error("Error getting Map: " + err)
 }
