@@ -13,8 +13,8 @@ if (newUser) {
       logger.error('Cannot create user: ' + err)
     }
   } else {
-    logger.warn('Invalid Password')
-    throw ('Sorry, Invalid Password!')
+    logger.warn('Passwords do not match')
+    throw ('Sorry, Passwords do not match!')
   } 
 } 
 
@@ -24,9 +24,9 @@ try {
   Users[EmailAddress].lastName = LastName
   Users[EmailAddress].title = Title
   Users[EmailAddress].AddTags({tags: "Applications:ATS"})
-  Users[EmailAddress].AddTags({tags: Tags})
-  // primary account should be set to the same as the logged in users UIAccount session
-  //Users[EmailAddress].PrimaryAccount = ATSAccountName
+  //Users[EmailAddress].AddTags({tags: Tags})
+  // primary account should be set to the same as the logged in user's Primary Account
+  Users[EmailAddress].PrimaryAccount = me.GetPrimaryAccount()
 
   Groups[Type].AddMember({
     member: EmailAddress
