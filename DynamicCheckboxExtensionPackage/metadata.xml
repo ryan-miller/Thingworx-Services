@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Entities>
+	<ExtensionPackages>
+		<ExtensionPackage name="DynamicCheckbox"
+						  description="Adds two bindable visible and disabled properties and value property"
+						  vendor="Thingworx"
+						  packageFile="DynamicCheckboxExtension.zip" 
+						  packageVersion="1.0" 
+						  minimumThingWorxVersion="3.2.0" />
+	</ExtensionPackages>
+</Entities>

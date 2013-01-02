@@ -1,0 +1,4 @@
+﻿.widget-checkbox-helper { width:120px; height:20px; background:url(images/helper.jpg) no-repeat; }
+.widget-checkbox { line-height:20px; position:relative; }
+.widget-checkbox input { position:absolute; height:20px; top:50%; margin-top:-10px; }
+.widget-checkbox span { padding-left:18px; }

@@ -1,0 +1,20 @@
+<Entities>
+  	<Widgets>
+		<Widget name="DynamicCheckbox" packageName="DynamicCheckbox" packageVersion="1.0">
+			<ResourceDependencies>
+				<!-- resources that must be registered with all mashup sub-systems -->
+				<Common/>
+				<!-- resources that ONLY get registered with mashup Builder -->
+				<Builder>
+					<ResourceDependency name="dynamiccheckbox.ide.js" />
+					<ResourceDependency name="dynamiccheckbox.ide.css" />
+				</Builder>
+				<!-- resources that ONLY get registered with mashup Runtime -->
+				<Runtime>
+					<ResourceDependency name="dynamiccheckbox.runtime.js" />
+					<ResourceDependency name="dynamiccheckbox.runtime.css" />
+				</Runtime>	
+			</ResourceDependencies>
+		</Widget>
+	</Widgets>
+</Entities>
