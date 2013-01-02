@@ -24,6 +24,7 @@ try {
   Users[EmailAddress].lastName = LastName
   Users[EmailAddress].title = Title
   Users[EmailAddress].AddTags({tags: "Applications:ATS"})
+  Users[EmailAddress].SetHomeMashup({name: 'ATSHome'})
   //Users[EmailAddress].AddTags({tags: Tags})
   // primary account should be set to the same as the logged in user's Primary Account
   Users[EmailAddress].PrimaryAccount = me.GetPrimaryAccount()
