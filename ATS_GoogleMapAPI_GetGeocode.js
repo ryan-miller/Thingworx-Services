@@ -1,6 +1,6 @@
 var encodedAddress = encodeURI(Address)
 // careful, 'sensor' attribute is required by google api
-var url = (me.APIURL + '/geocode/json?sensor=false&address=' + encodedAddress)
+var url = (me.APIURL + 'geocode/json?sensor=false&address=' + encodedAddress)
 var geocodeJSON
 var result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
   infoTableName: "InfoTable",
