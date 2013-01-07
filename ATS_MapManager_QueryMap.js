@@ -1,6 +1,6 @@
 var result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
-  infoTableName: "InfoTable",
-  dataShapeName: "ATSMapShape"
+  infoTableName: 'InfoTable',
+  dataShapeName: 'ATSMapShape'
 })
 
 // get my sites
