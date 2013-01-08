@@ -124,7 +124,8 @@ for each(site in filteredSites.rows) {
       Thing: site.name,
       DisplayName: site.SiteName,
       Location: site.Location,
-      Mashup: 'ATSMapSelectionDetails'
+      Mashup: 'ATSMapSelectionDetails',
+      Tags: Things[site.name].tags
     })
   }
 }
@@ -145,6 +146,7 @@ for each (device in filteredDevices.rows) {
     Thing: device.name,
     DisplayName: device.Nickname,
     Location: device.Location,
-    Mashup: 'ATSMapSelectionDetails'
+    Mashup: 'ATSMapSelectionDetails',
+    Tags: Things[device.name].tags
   })
 }
