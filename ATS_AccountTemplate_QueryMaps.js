@@ -66,6 +66,7 @@ for (i; i < hiddenSiteCount; i++) {
 var removeDevice = function(device) {
   filteredDevices = simpleFilter(filteredDevices, 'NE', 'name', device)
 }
+var state
 
 // main logic
 var site, device
@@ -128,7 +129,6 @@ for each(site in filteredSites.rows) {
   }
 }
 
-var state
 for each (device in filteredDevices.rows) {
   state = 'DeviceNormal'
 
