@@ -4,13 +4,13 @@ var oneDayInMs = 24 * 60 * 60 * 1000
 var now = new Date()
 var yesterdayInMs = now.getTime() - oneDayInMs
 var isMissing, hasRecentAlert
-var getAssignedDevices, getAlertType, getRecentAlert, getDeviceStatus
+var getAssignedDevices, getAlertType, getRecentAlert, getDeviceStatus, getMessageForStatus, getActionsForStatus
 var result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
   infoTableName: 'InfoTable',
   dataShapeName: 'ATSDeviceLoginAndStatus'
 })
 var device
-
+var status
 getDeviceStatus = function(device) {
   var state
   if (device.IsConflictedWithSiteGPS) {
@@ -23,6 +23,62 @@ getDeviceStatus = function(device) {
     state = 'DeviceNormal'
   }
   return state
+}
+
+// ENH: load status/messages/Actions as datatable with UI to manage
+getActionsForStatus = function(status) {
+  var result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
+    infoTableName: 'InfoTable',
+    dataShapeName: 'ATSMapAlertInfo'
+  })
+  switch (status) {
+    case 'DeviceConflict':
+      result.AddRow({
+        Message: 'Remove from map (not currently deployed)',
+        Mashup: 'AppLogViewer'
+      })
+      break
+    case 'DeviceAlert':
+      result.AddRow({
+        Message: 'Remove from map (not currently deployed)',
+        Mashup: 'AppLogViewer'
+      })
+      result.AddRow({
+        Message: 'Add New Site at this GPSLocation',
+        Mashup: 'AppLogViewer'
+      })
+      result.AddRow({
+        Message: 'Change Data Collection Site',
+        Mashup: 'AppLogViewer'
+      })
+      break
+    case 'DeviceMissing':
+      result.AddRow({
+        Message: 'Change Data Collection Site',
+        Mashup: 'AppLogViewer'
+      })
+      break
+    case 'DeviceNormal':
+    default:
+  }
+  return result
+}
+getMessageForStatus = function(status) {
+  var msg = ''
+  switch (status) {
+    case 'DeviceConflict':
+      msg = 'This sign is more than x feet from its assigned site'
+      break
+    case 'DeviceAlert':
+      msg = 'This sign has an alert'
+      break
+    case 'DeviceMissing':
+      msg = 'This sign has missed its estimated next log in'
+      break
+    case 'DeviceNormal':
+    default:
+  }
+  return msg
 }
 
 getAlertType = function(tags) {
@@ -111,31 +167,33 @@ getAssignedDevices = (function() {
 })()
 
 if (thingTemplate === 'ATSDeviceTemplate') {
+  status = getDeviceStatus(t)
   // single device, easy route
   result.AddRow({
     Device: t.name,
     NickName: t.Nickname,
-    Status: getDeviceStatus(t),  
+    Status: status,  
     LastLogin: t.LastLogin,
     EstimatedNextLogin: t.EstimatedNextLogin,
     DetailsMashup:'AppLogViewer', // TODO: replace
     RecentAlert: getRecentAlert(t.name), 
-    ErrorMessage: 'TBD'//, // TODO: look up
-    //Actions:
+    ErrorMessage: getMessageForStatus(status), 
+    Actions: getActionsForStatus(status)
   })
 } else if (thingTemplate === 'ATSSiteTemplate') {
   // need to find all devices at site, not so easy
   for each (device in getAssignedDevices.rows) {
+    status = getDeviceStatus(device)
     result.AddRow({
       Device: device.name,
       NickName: device.Nickname,
-      Status: getDeviceStatus(device), 
+      Status: status, 
       LastLogin: device.LastLogin,
       EstimatedNextLogin: device.EstimatedNextLogin,
       DetailsMashup:'AppLogViewer', // TODO: replace
       RecentAlert: getRecentAlert(device.name),
-      ErrorMessage: 'TBD'//, // TODO: look up
-      //Actions:
+      ErrorMessage: getMessageForStatus(status), 
+      Actions: getActionsForStatus(status)
     })
   }
 } else {
