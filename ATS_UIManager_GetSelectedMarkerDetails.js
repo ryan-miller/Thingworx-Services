@@ -170,30 +170,46 @@ if (thingTemplate === 'ATSDeviceTemplate') {
   status = getDeviceStatus(t)
   // single device, easy route
   result.AddRow({
-    Device: t.name,
-    NickName: t.Nickname,
-    Status: status,  
-    LastLogin: t.LastLogin,
+
+    Tags:               t.tags,
+    Device:             t.name,
+    NickName:           t.Nickname,
+    Location:           t.Location,
+    LastLogin:          t.LastLogin,
     EstimatedNextLogin: t.EstimatedNextLogin,
-    DetailsMashup:'AppLogViewer', // TODO: replace
-    RecentAlert: getRecentAlert(t.name), 
+    
+    Status: status,
+    
+    Actions:      getActionsForStatus(status),
+    RecentAlert:  getRecentAlert(t.name), 
     ErrorMessage: getMessageForStatus(status), 
-    Actions: getActionsForStatus(status)
+   
+    Reports:        'Last 7 Days',
+    DetailsMashup:  'AppLogViewer' // TODO: replace
+    
   })
 } else if (thingTemplate === 'ATSSiteTemplate') {
   // need to find all devices at site, not so easy
   for each (device in getAssignedDevices.rows) {
     status = getDeviceStatus(device)
     result.AddRow({
-      Device: device.name,
-      NickName: device.Nickname,
-      Status: status, 
-      LastLogin: device.LastLogin,
-      EstimatedNextLogin: device.EstimatedNextLogin,
+      
+      Status: status,
+
+      Reports:      'Last 7 Days',
       DetailsMashup:'AppLogViewer', // TODO: replace
-      RecentAlert: getRecentAlert(device.name),
-      ErrorMessage: getMessageForStatus(status), 
-      Actions: getActionsForStatus(status)
+      
+      Tags:               device.tags,
+      Device:             device.name,
+      Location:           device.Location,
+      NickName:           device.Nickname,
+      LastLogin:          device.LastLogin,
+      EstimatedNextLogin: device.EstimatedNextLogin,
+      
+      Actions:      getActionsForStatus(status),
+      RecentAlert:  getRecentAlert(device.name),
+      ErrorMessage: getMessageForStatus(status)
+      
     })
   }
 } else {
