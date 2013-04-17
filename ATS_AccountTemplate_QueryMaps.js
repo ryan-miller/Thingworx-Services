@@ -19,10 +19,11 @@ var simpleFilter = function(table, type, field, value) {
       }
     }
   })
-} 
-
-// get initial my devices list
+}
+    
+// get initial my devices list    
 var myDevices = me.GetAccountDevices()
+
 // remove default locations
 var filteredDevices = Resources['InfoTableFunctions'].Query({
   t: myDevices,
@@ -41,8 +42,10 @@ var filteredDevices = Resources['InfoTableFunctions'].Query({
     }
   }
 })
+
 // remove IsClearedFromMap
 filteredDevices = simpleFilter(filteredDevices, 'NE', 'IsClearedFromMap', true)
+
 /*
   remove hidden sites
   not a simple filter as Device.Sites.IsHidden is not available in result set
@@ -66,6 +69,7 @@ for (i; i < hiddenSiteCount; i++) {
 var removeDevice = function(device) {
   filteredDevices = simpleFilter(filteredDevices, 'NE', 'name', device)
 }
+    
 var state
 
 // main logic
@@ -81,72 +85,81 @@ var isMissing, hasRecentAlert
 isMissing = function(device) {
   return (device.LastLogin.getTime() + (device.WEB_ServerContactFrequency * 60 * 1000)) < now.getTime()
 }
-
+        
 hasRecentAlert = function(device) {
   return device.Alerts_LastAlertTime.getTime() > yesterdayInMs
 }
 
-for each(site in filteredSites.rows) {
-  
-  assignedDevices = Resources['InfoTableFunctions'].Query({
-    t: filteredDevices,
-    query: {
-      filters: {
-        type: 'EQ',
-        fieldName: 'Site',
-        value: site.name
-      }
+try {
+  for each(site in filteredSites.rows) {
+      assignedDevices = Resources['InfoTableFunctions'].Query({
+        t: filteredDevices,
+        query: {
+          filters: {
+            type: 'EQ',
+            fieldName: 'Site',
+            value: site.Name
+          }
+        }
+      })
+
+    if (assignedDevices.getRowCount() > 0 || IncludeEmptySites) {
+
+      // state priority: Conflicted > Alert > Missing > Normal
+      statePart1 = 'Location'
+      statePart2 = 'Empty'
+
+        for each(device in assignedDevices.rows) {
+          if (device.IsConflictedWithSiteGPS) {
+            statePart1 = 'LocationConflict'
+          } else if (hasRecentAlert(device)) {
+            statePart2 = 'Alert'
+            removeDevice(device.name)
+          } else if (isMissing(device) && statePart2 != 'Alert') {
+            statePart2 = 'Missing'
+            removeDevice(device.name)
+          } else {
+            statePart2 = 'Normal'
+            removeDevice(device.name)
+          }
+        }
+     
+      result.AddRow({
+        State: statePart1 + statePart2,
+        Thing: site.Name,
+        DisplayName: Things[site.Name].SiteName,
+        Location: Things[site.Name].Location,
+        Mashup: 'ATSMapSelectionDetails',
+        Tags: Things[site.Name].tags
+      })
     }
-  })
-
-  if (assignedDevices.getRowCount() > 0 || IncludeEmptySites) {
-
-    // state priority: Conflicted > Alert > Missing > Normal
-    statePart1 = 'Location'
-    statePart2 = 'Empty'
-
-    for each (device in assignedDevices.rows) {
-      if (device.IsConflictedWithSiteGPS) {
-        statePart1 = 'LocationConflict'
-      } else if (hasRecentAlert(device)) {
-        statePart2 = 'Alert'
-        removeDevice(device.name)
-      } else if (isMissing(device) && statePart2 != 'Alert') {
-        statePart2 = 'Missing'
-        removeDevice(device.name)
-      } else {
-        statePart2 = 'Normal'
-        removeDevice(device.name)
-      }
-    }
-    result.AddRow({
-      State: statePart1 + statePart2,
-      Thing: site.name,
-      DisplayName: site.SiteName,
-      Location: site.Location,
-      Mashup: 'ATSMapSelectionDetails',
-      Tags: Things[site.name].tags
-    })
   }
+} catch (ex) {
+  logger.warn('Error getting sites: ' + ex)
 }
 
-for each (device in filteredDevices.rows) {
-  state = 'DeviceNormal'
+try {
+  for each(device in filteredDevices.rows) {
+    state = 'DeviceNormal'
 
-  if (device.IsConflictedWithSiteGPS) {
-    state = 'DeviceConflict'
-  } else if (hasRecentAlert(device)) {
-    state = 'DeviceAlert'
-  } else if (isMissing(device)) {
-    state = 'DeviceMissing'
+    if (device.IsConflictedWithSiteGPS) {
+      state = 'DeviceConflict'
+    } else if (hasRecentAlert(device)) {
+      state = 'DeviceAlert'
+    } else if (isMissing(device)) {
+      state = 'DeviceMissing'
+    }
+
+    result.AddRow({
+      State: state,
+      Thing: device.name,
+      DisplayName: device.Nickname,
+      Location: device.Location,
+      Mashup: 'ATSMapSelectionDetails',
+      Tags: Things[device.name].tags
+    })
+
   }
-
-  result.AddRow({
-    State: state,
-    Thing: device.name,
-    DisplayName: device.Nickname,
-    Location: device.Location,
-    Mashup: 'ATSMapSelectionDetails',
-    Tags: Things[device.name].tags
-  })
+} catch (ex) {
+  logger.warn('Error getting devices: ' + ex)
 }
