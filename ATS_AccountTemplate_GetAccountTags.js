@@ -6,6 +6,8 @@ result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
 	dataShapeName : 'EntityList'
 })
 
+// TODO: I should be able to get JUST the MODEL TAGS from this call
+// currently I get everything and then have to filter (below)
 entities = Resources['SearchFunctions'].SearchModelTags({
   tags: 'ATSAccounts:' + me.name, 
   types: "ModelTagVocabulary"
