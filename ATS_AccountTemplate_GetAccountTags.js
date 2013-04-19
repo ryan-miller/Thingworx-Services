@@ -1,4 +1,4 @@
-var entities, vocabularies, result
+var vocabularies, result
 var v
 
 result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
@@ -6,22 +6,10 @@ result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
 	dataShapeName : 'EntityList'
 })
 
-// TODO: I should be able to get JUST the MODEL TAGS from this call
-// currently I get everything and then have to filter (below)
-entities = Resources['SearchFunctions'].SearchModelTags({
-  tags: 'ATSAccounts:' + me.name, 
-  types: "ModelTagVocabulary"
-})
-
-vocabularies = Resources['InfoTableFunctions'].Query({
-  t: entities,
-  query: {
-    filters: {
-      type: 'EQ',
-      fieldName: 'type',
-      value: 'ModelTagVocabulary'
-    }
-  }
+vocabularies = Resources['EntityServices'].GetEntityList({
+  maxItems: 5,
+  type: 'ModelTagVocabulary',
+  nameMask: me.name + '*'
 })
 
 for each (v in vocabularies.rows) {
