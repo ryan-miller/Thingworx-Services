@@ -1,9 +1,8 @@
-//logger.info('Attempting to clear ' + me.name + '.');
-
 var q = Things['TW.MessageQueue'];
 var it;
 
 logger.info('There are ' + q.Count() + ' rows in queue');
+
 while (q.Count() > 0) {
   
   it = q.Remove();

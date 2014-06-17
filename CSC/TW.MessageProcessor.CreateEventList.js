@@ -1,9 +1,7 @@
-// this 0652642.800031.400 should equal this 80652642000311
-// check digit here http://www.gs1.org/barcodes/support/check_digit_calculator
-
 var calculateCheckDigit = function (gtin) {
 
   // only for 13 input (or GTIN-14) at the moment
+	// this 0652642.800031.400 should equal this 80652642000311
   // check digit here http://www.gs1.org/barcodes/support/check_digit_calculator
   var sum = 0;
     

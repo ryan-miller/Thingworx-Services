@@ -1,4 +1,4 @@
-var exceptionFound = false;
+var validGTIN = true;
 
 var authorizations = Things['EventRepositoryDatabase'].GetAuthorizationsForIdentifierAndType({
   identifier_type: EventItem.IdentifierType,
@@ -30,47 +30,14 @@ var GLNMatch = function () {
   
 };
 
-var ValidSerialNumber = function () {
+if (!GLNMatch()) {
   
-  var found = false;
-  
-  for each (var row in filtered.rows) {
-    if (row.from <= EventItem.SerialNumber && EventItem.SerialNumber <= row.to) {
-      found = true;
-      break;
-    }
-    
-  }
-  
-  return found;
-  
-};
-
-var logException = function (code) {
-  
-  exceptionFound = true;
-  
+  validGTIN = false;
   me.LogEventItemException({
     EventItem: EventItem,
-    ExceptionCode: code
-  });
+    ExceptionCode: 1
+  });  
   
 }
 
-if (GLNMatch()) {
-  
-  if (ValidSerialNumber()) {
-    
-      // continue
-      
-  } else {
-    logException(2);
-    
-  }
-  
-} else {
-  logException(1);
-  
-}
-
-var result = exceptionFound;
+var result = validGTIN;
