@@ -24,19 +24,19 @@ var calculateCheckDigit = function (gtin) {
 };
 
 var generateGTIN = function(epc) {
-  
-  var splitAtColon = epc.split(':');
-  var splitEpc = splitAtColon[4].split('.');
-  var piDigit = splitEpc[1].charAt(0);
-  var companyPrefix = splitEpc[0];
-  var itemReference = splitEpc[1].substr(1);
-  var gtin = piDigit + companyPrefix + itemReference;
-  var checkDigit = calculateCheckDigit(gtin);
-  var fullGtin = gtin + checkDigit;
-    
-  return fullGtin;
+	
+	var splitAtColon = epc.split(':');
+	var splitEpc = splitAtColon[4].split('.');
+	var piDigit = splitEpc[1].charAt(0);
+	var companyPrefix = splitEpc[0];
+	var itemReference = splitEpc[1].substr(1);
+	var gtin = piDigit + companyPrefix + itemReference;
+	var checkDigit = calculateCheckDigit(gtin);
+	var fullGtin = gtin + checkDigit;
+	
+	return fullGtin;
+	
 };
-
 
 // EventType is different. Change from present to past tense.
 var getEventTypeForBizStep = function (bizStep) {
