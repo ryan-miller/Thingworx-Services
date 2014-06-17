@@ -3,7 +3,9 @@ var files = me.GetFileListing({
   path: '/'
 });
 
-for each (var file in files.rows) {
+var file;
+
+for each (file in files.rows) {
   
   me.DeleteFile({
     path: file.path

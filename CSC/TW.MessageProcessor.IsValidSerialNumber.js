@@ -25,30 +25,31 @@ var filtered = Resources['InfoTableFunctions'].Query({
 });
 
 var ValidSerialNumber = function () {
-  
-  var found = false;
-  
-  for each (var row in filtered.rows) {
-    
-    if (row.from <= EventItem.SerialNumber && EventItem.SerialNumber <= row.to) {
-      found = true;
-      break;
-    }
-    
-  }
-  
-  return found;
-  
+	
+	var found = false;
+	var row;
+	
+	for each (row in filtered.rows) {
+		
+		if (row.from <= EventItem.SerialNumber && EventItem.SerialNumber <= row.to) {
+			found = true;
+			break;
+		}
+		
+	}
+	
+	return found;
+	
 };
 
 if (!ValidSerialNumber()) {
-  
-  validSerialNumber = false;  
-  
-  me.LogEventItemException({
-    EventItem: EventItem,
-    ExceptionCode: 2
-  });
+	
+	validSerialNumber = false;
+	
+	me.LogEventItemException({
+		EventItem: EventItem,
+		ExceptionCode: 2
+	});
 
 }
 

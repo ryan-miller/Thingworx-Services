@@ -33,8 +33,9 @@ var GLNMatch = function () {
 var ValidSerialNumber = function () {
   
   var found = false;
+	var row;
   
-  for each (var row in filtered.rows) {
+  for each (row in filtered.rows) {
     if (row.from <= EventItem.SerialNumber && EventItem.SerialNumber <= row.to) {
       found = true;
       break;

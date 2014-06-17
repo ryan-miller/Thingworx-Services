@@ -1,28 +1,26 @@
 var calculateCheckDigit = function (gtin) {
-
-  // only for 13 input (or GTIN-14) at the moment
+	
+	// only for 13 input (or GTIN-14) at the moment
 	// this 0652642.800031.400 should equal this 80652642000311
-  // check digit here http://www.gs1.org/barcodes/support/check_digit_calculator
-  var sum = 0;
-    
-  for (var i = 0; i < gtin.length; i++) {
-    
-    if (i % 2 == 0) {
-          
-      sum += gtin.charAt(i) * 1;
-        
-    } else {
-        
-      sum += gtin.charAt(i) * 3;
-        
-    }
-        
-  }
-    
-  var nextMultipleOfTen = Math.ceil(sum / 10) * 10;
-    
-  return (nextMultipleOfTen - sum);
-
+	// check digit here http://www.gs1.org/barcodes/support/check_digit_calculator
+	var sum = 0;
+	var i = 0;
+	var nextMultipleOfTen;
+	
+	for (i; i < gtin.length; i++) {
+		
+		if (i % 2 == 0) {
+			sum += gtin.charAt(i) * 1;
+		} else {
+			sum += gtin.charAt(i) * 3;
+		}
+		
+	}
+	
+	nextMultipleOfTen = Math.ceil(sum / 10) * 10;
+	
+	return (nextMultipleOfTen - sum);
+	
 };
 
 var generateGTIN = function(epc) {
@@ -102,8 +100,10 @@ var result = Resources['InfoTableFunctions'].CreateInfoTableFromDataShape({
   dataShapeName: 'TW.EventListInformation'
 });
 
+var epc;
+
 // for each event add to the result infotable
-for each (var epc in eventsXML) {
+for each (epc in eventsXML) {
   
   result.AddRow({
     // hard coded values

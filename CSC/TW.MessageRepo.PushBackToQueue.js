@@ -3,9 +3,12 @@ var files = me.GetFileListing({
   path: '/'
 });
 
-for each (var file in files.rows) {
+var file;
+var xmlContent;
+
+for each (file in files.rows) {
   
-  var xmlContent = me.LoadXML({
+  xmlContent = me.LoadXML({
     path: file.path
   });
   
